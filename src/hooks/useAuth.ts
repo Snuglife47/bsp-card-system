@@ -18,39 +18,56 @@ export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const fetchProfile = useCallback(async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string): Promise<User | null> => {
     const { data } = await supabase
       .from('users')
       .select('*')
       .eq('id', userId)
       .single()
-    setUser(data as User | null)
+    const u = data as User | null
+    setUser(u)
+    return u
   }, [])
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
+    let mounted = true
+
+    async function init() {
+      const { data: { session: s } } = await supabase.auth.getSession()
+      if (!mounted) return
       setSession(s)
-      if (s?.user) fetchProfile(s.user.id)
-      setLoading(false)
-    })
+      if (s?.user) {
+        await fetchProfile(s.user.id)
+      }
+      if (mounted) setLoading(false)
+    }
+
+    init()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, s) => {
+      async (_event, s) => {
+        if (!mounted) return
         setSession(s)
         if (s?.user) {
-          fetchProfile(s.user.id)
+          await fetchProfile(s.user.id)
         } else {
           setUser(null)
         }
-        setLoading(false)
       },
     )
-    return () => subscription.unsubscribe()
+
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [fetchProfile])
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) return { error: error.message }
+    if (data.user) {
+      await fetchProfile(data.user.id)
+    }
     return {}
   }
 

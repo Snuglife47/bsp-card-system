@@ -27,11 +27,18 @@ export default function AuthenticatedLayout({
 }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { user, loading, signOut } = useAuth()
+  const { user, session, loading, signOut } = useAuth()
   const [outstandingCount, setOutstandingCount] = useState(0)
   const [failedCount, setFailedCount] = useState(0)
 
   useEffect(() => {
+    if (!loading && !session) {
+      router.replace('/login')
+    }
+  }, [loading, session, router])
+
+  useEffect(() => {
+    if (!session) return
     async function fetchCounts() {
       const { count: outstanding } = await supabase
         .from('cards')
@@ -49,20 +56,16 @@ export default function AuthenticatedLayout({
     fetchCounts()
     const interval = setInterval(fetchCounts, 10000)
     return () => clearInterval(interval)
-  }, [])
+  }, [session])
 
   const handleSignOut = async () => {
     await signOut()
-    router.push('/login')
+    router.replace('/login')
   }
 
   const t = useMemo(() => TITLES[pathname] || { title: 'BSP Cards', sub: '' }, [pathname])
 
-  useEffect(() => {
-    if (!loading && !user) router.push('/login')
-  }, [loading, user, router])
-
-  if (loading || !user) {
+  if (loading || !session) {
     return (
       <div className="flex h-screen items-center justify-center bg-sage-50">
         <p className="text-sm text-muted">Loading...</p>

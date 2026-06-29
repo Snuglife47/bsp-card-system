@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { LogIn, AlertCircle } from 'lucide-react'
@@ -8,26 +8,37 @@ import { useAuth } from '@/hooks/useAuth'
 
 export default function LoginPage() {
   const router = useRouter()
-  const { signIn, loading } = useAuth()
+  const { signIn, user, loading } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace('/dashboard')
+    }
+  }, [loading, user, router])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setBusy(true)
-    const result = await signIn(email, password)
-    if (result.error) {
-      setError(result.error)
+    try {
+      const result = await signIn(email, password)
+      if (result.error) {
+        setError(result.error)
+        setBusy(false)
+      } else {
+        router.replace('/dashboard')
+      }
+    } catch {
+      setError('Connection failed. Please try again.')
       setBusy(false)
-    } else {
-      router.push('/dashboard')
     }
   }
 
-  if (loading) {
+  if (loading || user) {
     return (
       <div className="flex min-h-full items-center justify-center bg-teal-900">
         <div className="text-sage-200 text-sm">Loading...</div>
