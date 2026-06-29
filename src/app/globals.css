@@ -1,26 +1,59 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-teal-900: #0D3B2E;
+  --color-teal-800: #134635;
+  --color-teal-700: #1A5C46;
+  --color-teal-600: #27765B;
+  --color-sage-50: #F4F8F6;
+  --color-sage-100: #EEF4F0;
+  --color-sage-200: #DCE7E0;
+  --color-sage-300: #C2D6CB;
+  --color-ink: #1F2A26;
+  --color-muted: #6B7A74;
+  --color-amber: #C8821A;
+  --color-amber-soft: #FBEFD9;
+  --color-danger: #B23A3A;
+  --color-danger-soft: #F7E4E4;
+  --color-gold: #B8893B;
+  --color-gold-chip: #F6ECCF;
+  --color-gold-text: #7A5A14;
+  --color-gold-ring: #D9BE7E;
+  --color-plat-chip: #E7E9EC;
+  --color-plat-text: #3D444C;
+  --color-plat-ring: #C0C6CD;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --shadow-card: 0 1px 2px rgba(13,59,46,0.04), 0 4px 16px rgba(13,59,46,0.06);
+  --shadow-drawer: -8px 0 32px rgba(13,59,46,0.12);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-sage-50);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+}
+
+.ref {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-sage-200);
+  border-radius: 8px;
+  border: 2px solid var(--color-sage-50);
 }
