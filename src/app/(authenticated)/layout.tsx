@@ -58,7 +58,11 @@ export default function AuthenticatedLayout({
 
   const t = useMemo(() => TITLES[pathname] || { title: 'BSP Cards', sub: '' }, [pathname])
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user) router.push('/login')
+  }, [loading, user, router])
+
+  if (loading || !user) {
     return (
       <div className="flex h-screen items-center justify-center bg-sage-50">
         <p className="text-sm text-muted">Loading...</p>
