@@ -27,7 +27,7 @@ export default function AuthenticatedLayout({
 }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { user, session, loading, signOut } = useAuth()
+  const { user, session, loading, error: authError, signOut } = useAuth()
   const [outstandingCount, setOutstandingCount] = useState(0)
   const [failedCount, setFailedCount] = useState(0)
 

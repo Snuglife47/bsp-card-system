@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth'
 
 export default function LoginPage() {
   const router = useRouter()
-  const { signIn, user, loading } = useAuth()
+  const { signIn, user, loading, error: authError } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -16,9 +16,16 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
+      console.log('[login] Already authenticated, redirecting...')
       router.replace('/dashboard')
     }
   }, [loading, user, router])
+
+  useEffect(() => {
+    if (authError) {
+      console.error('[login] Auth hook error:', authError)
+    }
+  }, [authError])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,21 +37,17 @@ export default function LoginPage() {
         setError(result.error)
         setBusy(false)
       } else {
+        console.log('[login] Sign in successful, redirecting...')
         router.replace('/dashboard')
       }
-    } catch {
+    } catch (err) {
+      console.error('[login] Submit exception:', err)
       setError('Connection failed. Please try again.')
       setBusy(false)
     }
   }
 
-  if (loading || user) {
-    return (
-      <div className="flex min-h-full items-center justify-center bg-teal-900">
-        <div className="text-sage-200 text-sm">Loading...</div>
-      </div>
-    )
-  }
+  const displayError = error || authError
 
   return (
     <div className="flex min-h-full items-center justify-center bg-teal-900 px-4 py-10">
@@ -63,10 +66,10 @@ export default function LoginPage() {
             Enter your credentials to access the card notification system.
           </p>
 
-          {error && (
+          {displayError && (
             <div className="mt-4 flex items-center gap-2 rounded-lg bg-danger-soft p-3 text-sm text-danger">
               <AlertCircle className="h-4 w-4 shrink-0" />
-              {error}
+              {displayError}
             </div>
           )}
 
@@ -101,11 +104,11 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={busy}
+            disabled={busy || loading}
             className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-teal-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <LogIn className="h-4 w-4" />
-            {busy ? 'Signing in...' : 'Sign in'}
+            {busy ? 'Signing in...' : loading ? 'Connecting...' : 'Sign in'}
           </button>
 
           <div className="mt-4 rounded-lg bg-sage-50 p-3">
