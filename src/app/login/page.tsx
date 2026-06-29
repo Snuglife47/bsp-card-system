@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { CreditCard, LogIn, AlertCircle } from 'lucide-react'
+import Image from 'next/image'
+import { LogIn, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function LoginPage() {
@@ -38,9 +39,7 @@ export default function LoginPage() {
     <div className="flex min-h-full items-center justify-center bg-teal-900 px-4 py-10">
       <div className="w-full max-w-md">
         <div className="mb-6 flex items-center gap-3 text-white">
-          <div className="grid h-11 w-11 place-items-center rounded-xl bg-white/10 ring-1 ring-white/20">
-            <CreditCard className="h-6 w-6" />
-          </div>
+          <Image src="/bsp-logo.svg" alt="BSP" width={44} height={44} className="rounded-xl" />
           <div>
             <div className="text-lg font-bold leading-tight">BSP Card Notifications</div>
             <div className="text-xs text-sage-200">Card officer console</div>

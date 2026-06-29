@@ -1,10 +1,11 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, ListChecks, Search, Upload,
-  FileSpreadsheet, MailWarning, ScrollText, CreditCard,
+  FileSpreadsheet, MailWarning, ScrollText,
 } from 'lucide-react'
 
 const NAV = [
@@ -28,9 +29,7 @@ export function Sidebar({ outstandingCount, failedCount }: SidebarProps) {
   return (
     <aside className="hidden w-64 shrink-0 flex-col bg-teal-900 text-sage-100 md:flex">
       <div className="flex items-center gap-2.5 px-5 py-5">
-        <div className="grid h-9 w-9 place-items-center rounded-lg bg-white/10 ring-1 ring-white/15">
-          <CreditCard className="h-5 w-5" />
-        </div>
+        <Image src="/bsp-logo.svg" alt="BSP" width={36} height={36} className="rounded-lg" />
         <div className="leading-tight">
           <div className="text-sm font-bold text-white">BSP Cards</div>
           <div className="text-[11px] text-sage-200">Notification console</div>

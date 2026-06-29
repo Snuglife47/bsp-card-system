@@ -15,6 +15,9 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: 'BSP Card Notifications',
   description: 'BSP Card Management & Customer Notification System',
+  icons: {
+    icon: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({

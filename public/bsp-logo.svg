@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" rx="24" fill="#0D3B2E"/>
+  <g transform="translate(100, 45)" fill="none" stroke="#4ADE80" stroke-width="5" stroke-linecap="round">
+    <!-- stem -->
+    <line x1="0" y1="95" x2="0" y2="30"/>
+    <!-- left leaf bottom -->
+    <path d="M0,85 C-30,75 -40,55 -25,40" stroke-width="5"/>
+    <path d="M-25,40 C-15,35 -5,45 0,55" stroke-width="4"/>
+    <!-- right leaf bottom -->
+    <path d="M0,75 C30,65 40,45 25,30" stroke-width="5"/>
+    <path d="M25,30 C15,25 5,35 0,45" stroke-width="4"/>
+    <!-- left leaf top -->
+    <path d="M0,50 C-25,40 -35,20 -20,5" stroke-width="5"/>
+    <path d="M-20,5 C-10,0 -2,10 0,20" stroke-width="4"/>
+    <!-- right leaf top -->
+    <path d="M0,40 C25,30 35,10 20,-5" stroke-width="5"/>
+    <path d="M20,-5 C10,-10 2,0 0,10" stroke-width="4"/>
+    <!-- top sprout -->
+    <path d="M0,15 C-10,5 -8,-10 0,-20" stroke-width="4.5"/>
+    <path d="M0,10 C10,0 8,-15 0,-20" stroke-width="4.5"/>
+  </g>
+  <!-- BSP text -->
+  <text x="100" y="168" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="42" fill="white" letter-spacing="6">BSP</text>
+</svg>
