@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@/types'
 import type { Session } from '@supabase/supabase-js'
@@ -19,8 +19,10 @@ export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const currentUserId = useRef<string | null>(null)
 
   const fetchProfile = useCallback(async (userId: string): Promise<User | null> => {
+    if (currentUserId.current === userId && user) return user
     try {
       console.log('[auth] Fetching profile for', userId)
       const { data, error: dbError } = await supabase
@@ -34,13 +36,14 @@ export function useAuth(): AuthState {
       }
       console.log('[auth] Profile loaded:', data?.name)
       const u = data as User | null
+      currentUserId.current = userId
       setUser(u)
       return u
     } catch (err) {
       console.error('[auth] Profile fetch exception:', err)
       return null
     }
-  }, [])
+  }, [user])
 
   useEffect(() => {
     let mounted = true
@@ -49,19 +52,15 @@ export function useAuth(): AuthState {
       try {
         console.log('[auth] Checking session...')
         const { data: { session: s }, error: sessionError } = await supabase.auth.getSession()
-
         if (!mounted) return
-
         if (sessionError) {
           console.error('[auth] getSession error:', sessionError.message)
           setError(sessionError.message)
           setLoading(false)
           return
         }
-
         console.log('[auth] Session:', s ? 'found' : 'none')
         setSession(s)
-
         if (s?.user) {
           await fetchProfile(s.user.id)
         }
@@ -76,14 +75,14 @@ export function useAuth(): AuthState {
     init()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, s) => {
+      (_event, s) => {
         if (!mounted) return
-        console.log('[auth] State change:', _event)
-        setSession(s)
-        if (s?.user) {
-          await fetchProfile(s.user.id)
-        } else {
+        if (_event === 'SIGNED_OUT') {
+          setSession(null)
           setUser(null)
+          currentUserId.current = null
+        } else if (_event === 'SIGNED_IN' || _event === 'TOKEN_REFRESHED') {
+          setSession(s)
         }
       },
     )
@@ -92,7 +91,8 @@ export function useAuth(): AuthState {
       mounted = false
       subscription.unsubscribe()
     }
-  }, [fetchProfile])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -102,11 +102,12 @@ export function useAuth(): AuthState {
         console.error('[auth] Sign in error:', signInError.message)
         return { error: signInError.message }
       }
-      console.log('[auth] Sign in success, fetching profile...')
+      console.log('[auth] Sign in success')
+      setSession(data.session)
       if (data.user) {
+        currentUserId.current = null
         await fetchProfile(data.user.id)
       }
-      setSession(data.session)
       return {}
     } catch (err) {
       console.error('[auth] Sign in exception:', err)
@@ -122,6 +123,7 @@ export function useAuth(): AuthState {
     }
     setUser(null)
     setSession(null)
+    currentUserId.current = null
   }
 
   return { session, user, loading, error, signIn, signOut }

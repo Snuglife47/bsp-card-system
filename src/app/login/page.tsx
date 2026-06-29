@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { LogIn, AlertCircle } from 'lucide-react'
@@ -8,27 +8,16 @@ import { useAuth } from '@/hooks/useAuth'
 
 export default function LoginPage() {
   const router = useRouter()
-  const { signIn, user, loading, error: authError } = useAuth()
+  const { signIn, loading, error: authError } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
-
-  useEffect(() => {
-    if (!loading && user) {
-      console.log('[login] Already authenticated, redirecting...')
-      router.replace('/dashboard')
-    }
-  }, [loading, user, router])
-
-  useEffect(() => {
-    if (authError) {
-      console.error('[login] Auth hook error:', authError)
-    }
-  }, [authError])
+  const redirected = useRef(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (redirected.current) return
     setError('')
     setBusy(true)
     try {
@@ -37,11 +26,10 @@ export default function LoginPage() {
         setError(result.error)
         setBusy(false)
       } else {
-        console.log('[login] Sign in successful, redirecting...')
+        redirected.current = true
         router.replace('/dashboard')
       }
-    } catch (err) {
-      console.error('[login] Submit exception:', err)
+    } catch {
       setError('Connection failed. Please try again.')
       setBusy(false)
     }
@@ -75,38 +63,16 @@ export default function LoginPage() {
 
           <div className="mt-5 space-y-3">
             <label className="block">
-              <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-muted">
-                Email
-              </span>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tessa.aila@demo.bsp"
-                required
-                className="w-full rounded-lg border border-sage-300 bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20"
-              />
+              <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-muted">Email</span>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tessa.aila@demo.bsp" required className="w-full rounded-lg border border-sage-300 bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20" />
             </label>
             <label className="block">
-              <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-muted">
-                Password
-              </span>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
-                required
-                className="w-full rounded-lg border border-sage-300 bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20"
-              />
+              <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-muted">Password</span>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter password" required className="w-full rounded-lg border border-sage-300 bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20" />
             </label>
           </div>
 
-          <button
-            type="submit"
-            disabled={busy || loading}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-teal-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <button type="submit" disabled={busy || loading} className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-teal-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50">
             <LogIn className="h-4 w-4" />
             {busy ? 'Signing in...' : loading ? 'Connecting...' : 'Sign in'}
           </button>
